@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from .models import User, Patient, Doctor
+from .models import User, Patient, Doctor, Appointment
 from django.core.exceptions import ValidationError
 from .forms import PatientRegistrationForm, DoctorRegistrationForm
+import datetime
 
 
 def homepage(request):
@@ -151,4 +152,23 @@ def patient_welcome_view(request):
 
 
 def doctor_dashboard(request):
-    return render(request, 'doctor_dashboard.html')
+    # Calculate total patients
+    total_patients = Patient.objects.count()
+
+    # Assuming that "pending patients" are those who have a pending appointment
+    pending_patients = Appointment.objects.filter(status='pending',
+                                                  doctor=request.user.doctor)
+
+    todays_appointments = Appointment.objects.filter(
+        date=datetime.date.today(), doctor=request.user.doctor)
+
+    context = {
+        'total_patients': total_patients,
+        'pending_patients': pending_patients,
+        'todays_appointments': todays_appointments,
+    }
+    return render(request, 'doctor_dashboard.html', context)
+
+def availability(request):
+    # Logic for managing doctor's availability
+    return render(request, 'availability.html')

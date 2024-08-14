@@ -80,3 +80,16 @@ class Doctor(models.Model):
 
     def __str__(self):
         return f'{self.firstname} {self.lastname} ({self.specialty})'
+
+
+class Appointment(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('confirmed', 'Confirmed'), ('completed', 'Completed')])
+
+    def __str__(self):
+        return (f"{self.patient.firstname} {self.patient.lastname} with Dr. "
+                f"{self.doctor.firstname} {self.doctor.lastname} on {self.date} "
+                f"at {self.time}")

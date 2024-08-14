@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>doc</title>
+    <title>Doctor Dashboard</title>
 </head>
 <body>
-<h1>doc welcome</h1>
+    <nav>
+        <ul>
+            <li><a href="{% url 'doctor_dashboard' %}">Home</a></li>
+            <li><a href="{% url 'availability' %}">Availability</a></li>
+        </ul>
+    </nav>
+
+    <h1>Doctor Dashboard</h1>
+
+    <div>
+        <h2>Total Patients: {{ total_patients }}</h2>
+        <h2>Today's Appointments:</h2>
+        <ul>
+    {% if todays_appointments %}
+        {% for appointment in todays_appointments %}
+            <li>{{ appointment.patient.firstname }} {{ appointment.patient.lastname }} at {{ appointment.time }}</li>
+        {% endfor %}
+    {% else %}
+        <li>No appointments for today.</li>
+    {% endif %}
+</ul>
+        <h2>Pending Patients:</h2>
+        <ul>
+            {% for patient in pending_patients %}
+                <li>{{ patient.name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>
