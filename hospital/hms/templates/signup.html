@@ -1,0 +1,22 @@
+<!-- templates/hms/signup.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+</head>
+<body>
+    <h1>Signup</h1>
+    <form action="{% url 'signup' %}" method="post">
+        {% csrf_token %}
+        <label for="role">Select Role:</label>
+        <select id="role" name="role">
+            <option value="patient">Patient</option>
+            <option value="doctor">Doctor</option>
+        </select><br>
+        <button type="submit">Continue</button>
+    </form>
+</body>
+</html>

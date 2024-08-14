@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Registration</title>
+    <script>
+        function showPopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "block";
+        }
+
+        function closePopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "none";
+            window.location.href = "{% url 'homepage' %}";
+        }
+    </script>
+    <style>
+        #popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #000;
+            padding: 10px;
+            background-color: #fff;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Doctor Registration</h1>
+<!--    <form method="post" action="{% url 'doctor_reg' %}" onsubmit="showPopup(); return false;">-->
+<!--        {% csrf_token %}-->
+<!--        {{ form.as_p }}-->
+<!--        <input type="text" name="title" placeholder="Title" required>-->
+<!--        <input type="text" name="firstname" placeholder="First Name" required>-->
+<!--        <input type="text" name="lastname" placeholder="Last Name" required>-->
+<!--        <input type="date" name="dob" placeholder="Date of Birth" required>-->
+<!--        <input type="text" name="specialty" placeholder="Specialty" required>-->
+<!--        <input type="text" name="phone_number" placeholder="Phone Number" required>-->
+<!--        <button type="submit">Signup</button>-->
+<!--    </form>-->
+    <form method="post" action="{% url 'doctor_reg' %}">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Title" required>
+    <input type="text" name="firstname" placeholder="First Name" required>
+    <input type="text" name="lastname" placeholder="Last Name" required>
+    <input type="date" name="dob" placeholder="Date of Birth" required>
+    <input type="text" name="specialty" placeholder="Specialty" required>
+    <input type="text" name="phone_number" placeholder="Phone Number" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+    <button type="submit">Signup</button>
+</form>
+
+    <div id="popup">
+        <p>Signup successful!</p>
+        <button onclick="closePopup()">OK</button>
+    </div>
+</body>
+</html>

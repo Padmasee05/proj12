@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+</head>
+<body>
+    <h1>Welcome to the Hospital Management System</h1>
+<!--    <form method="post" action="{% url 'homepage' %}">-->
+<!--        {% csrf_token %}-->
+<!--        <label for="email">Email:</label>-->
+<!--        <input type="email" id="email" name="email" required><br>-->
+<!--        <label for="password">Password:</label>-->
+<!--        <input type="password" id="password" name="password" required><br>-->
+<!--        <button type="submit">Login</button>-->
+<!--    </form>-->
+    <form method="post" action="{% url 'homepage' %}">
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="Email">
+    <input type="password" name="password" placeholder="Password">
+    <button type="submit" name="login">Login</button>
+</form>
+
+    <a href="{% url 'signup' %}">Signup</a>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
