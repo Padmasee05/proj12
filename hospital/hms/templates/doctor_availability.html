@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Availability</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        #popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #000;
+            padding: 10px;
+            background-color: #fff;
+            z-index: 1000;
+        }
+        .slot-checkboxes input {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mark Availability</h1>
+    <form method="post" action="{% url 'doctor_availability' %}">
+        {% csrf_token %}
+
+        <label for="dates">Select Dates:</label>
+        <input type="text" id="dates" name="dates" placeholder="Select dates" required>
+
+        <fieldset class="slot-checkboxes">
+            <legend>Select Slots:</legend>
+            <label><input type="checkbox" name="slots" value="09:00"> 09:00 AM</label>
+            <label><input type="checkbox" name="slots" value="10:00"> 10:00 AM</label>
+            <label><input type="checkbox" name="slots" value="11:00"> 11:00 AM</label>
+            <label><input type="checkbox" name="slots" value="12:00"> 12:00 PM</label>
+            <label><input type="checkbox" name="slots" value="01:00"> 01:00 PM</label>
+            <label><input type="checkbox" name="slots" value="02:00"> 02:00 PM</label>
+            <label><input type="checkbox" name="slots" value="03:00"> 03:00 PM</label>
+            <label><input type="checkbox" name="slots" value="04:00"> 04:00 PM</label>
+            <label><input type="checkbox" name="slots" value="05:00"> 05:00 PM</label>
+        </fieldset>
+
+        <button type="submit">Save Availability</button>
+    </form>
+
+    <div id="popup">
+        <p>Scheduled successfully!</p>
+        <button onclick="closePopup()">OK</button>
+    </div>
+
+    <script>
+        // Initialize Flatpickr
+        flatpickr("#dates", {
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+        });
+
+        function showPopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "block";
+        }
+
+        function closePopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "none";
+            window.location.href = "{% url 'doctor_dashboard' %}";
+        }
+    </script>
+</body>
+</html>

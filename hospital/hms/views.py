@@ -1,9 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from .models import User, Patient, Doctor, Appointment
+from .models import User, Patient, Doctor, Appointment, DoctorAvailability
 from django.core.exceptions import ValidationError
-from .forms import PatientRegistrationForm, DoctorRegistrationForm
+from .forms import PatientRegistrationForm, DoctorRegistrationForm, \
+    AvailabilityForm
 import datetime
 
 
@@ -26,28 +28,6 @@ def homepage(request):
                 messages.error(request, 'Invalid email or password.')
     return render(request, 'homepage.html')
 
-
-# def login_view(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-#         password = request.POST.get('password')
-#
-#         print(f"Email: {email}, Password: {password}")  # Debugging
-#
-#         user = authenticate(request, email=email, password=password)
-#
-#         if user is not None:
-#             print("User authenticated successfully")
-#             login(request, user)
-#             if hasattr(user, 'patient'):
-#                 return redirect('patient_welcome')
-#             else:
-#                 return redirect('homepage')  # Adjust as necessary
-#         else:
-#             print("Authentication failed")
-#             messages.error(request, 'Invalid email or password.')
-#
-#     return render(request, 'homepage.html')
 
 def login_view(request):
     if request.method == 'POST':
@@ -169,6 +149,23 @@ def doctor_dashboard(request):
     }
     return render(request, 'doctor_dashboard.html', context)
 
-def availability(request):
-    # Logic for managing doctor's availability
-    return render(request, 'availability.html')
+
+def doctor_availability(request):
+    if request.method == 'POST':
+        dates = request.POST.getlist('dates')
+        slots = request.POST.getlist('slots')
+
+        # Handle saving the availability in your model
+        for date in dates:
+            for slot in slots:
+                DoctorAvailability.objects.create(
+                    doctor=request.user.doctor,
+                    date=date,
+                    slot=slot
+                )
+
+        # Show a success message
+        messages.success(request, 'Scheduled successfully!')
+        return redirect('doctor_availability')
+
+    return render(request, 'doctor_availability.html')

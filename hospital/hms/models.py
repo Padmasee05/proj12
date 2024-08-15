@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
+from django.utils import timezone
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -93,3 +95,12 @@ class Appointment(models.Model):
         return (f"{self.patient.firstname} {self.patient.lastname} with Dr. "
                 f"{self.doctor.firstname} {self.doctor.lastname} on {self.date} "
                 f"at {self.time}")
+
+
+class DoctorAvailability(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    date = models.DateField()
+    slot = models.TimeField()
+
+    def __str__(self):
+        return f"{self.doctor} - {self.date} - {self.slot}"
