@@ -2,9 +2,89 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>patient_welcome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Welcome</title>
+{% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-<h1>patient welcome</h1>
+    <!-- Navigation Bar -->
+    <nav>
+        <ul>
+            <li><a href="{% url 'patient_welcome' %}">Home</a></li>
+            <li><a href="{% url 'patient_appointments' %}">Appointments</a></li>
+        </ul>
+    </nav>
+
+    <!-- Appointment Sections -->
+    <h1>Welcome, {{ patient_name }}</h1>
+
+    <div class="appointment-section">
+        <button onclick="showSection('current')">Current</button>
+        <button onclick="showSection('past')">Past</button>
+        <button onclick="showSection('upcoming')">Upcoming</button>
+
+        <div id="current" class="appointment-list">
+            <h2>Current Appointments</h2>
+            {% if current_appointments %}
+                <ul>
+                    {% for appointment in current_appointments %}
+                        <li>
+                            Date: {{ appointment.date }}<br>
+                            Doctor: {{ appointment.doctor }}<br>
+                            Time: {{ appointment.time }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No current appointments.</p>
+            {% endif %}
+        </div>
+
+        <div id="past" class="appointment-list" style="display:none;">
+            <h2>Past Appointments</h2>
+            {% if past_appointments %}
+                <ul>
+                    {% for appointment in past_appointments %}
+                        <li>
+                            Date: {{ appointment.date }}<br>
+                            Doctor: {{ appointment.doctor }}<br>
+                            Time: {{ appointment.time }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No past appointments.</p>
+            {% endif %}
+        </div>
+
+        <div id="upcoming" class="appointment-list" style="display:none;">
+            <h2>Upcoming Appointments</h2>
+            {% if upcoming_appointments %}
+                <ul>
+                    {% for appointment in upcoming_appointments %}
+                        <li>
+                            Date: {{ appointment.date }}<br>
+                            Doctor: {{ appointment.doctor }}<br>
+                            Time: {{ appointment.time }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No upcoming appointments.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function showSection(section) {
+            document.getElementById('current').style.display = 'none';
+            document.getElementById('past').style.display = 'none';
+            document.getElementById('upcoming').style.display = 'none';
+
+            document.getElementById(section).style.display = 'block';
+        }
+    </script>
 </body>
 </html>

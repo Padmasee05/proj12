@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from .models import User, Patient, Doctor, Appointment, DoctorAvailability
@@ -128,7 +128,24 @@ def patient_reg_view(request):
 
 
 def patient_welcome_view(request):
-    return render(request, 'patient_welcome.html')
+    user = request.user
+    patient = get_object_or_404(Patient,
+                                user=user)  # Fetch the Patient instance
+
+    current_appointments = Appointment.objects.filter(patient=patient,
+                                                      date__exact=datetime.date.today())
+    past_appointments = Appointment.objects.filter(patient=patient,
+                                                   date__lt=datetime.date.today())
+    upcoming_appointments = Appointment.objects.filter(patient=patient,
+                                                       date__gt=datetime.date.today())
+
+    context = {
+        'patient_name': patient.firstname,  # Customize as needed
+        'current_appointments': current_appointments,
+        'past_appointments': past_appointments,
+        'upcoming_appointments': upcoming_appointments,
+    }
+    return render(request, 'patient_welcome.html', context)
 
 
 def doctor_dashboard(request):
@@ -169,3 +186,7 @@ def doctor_availability(request):
         return redirect('doctor_availability')
 
     return render(request, 'doctor_availability.html')
+
+
+def patient_appointments(request):
+    return render(request, 'appointments.html')
