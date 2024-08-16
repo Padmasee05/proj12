@@ -5,6 +5,46 @@
     <title>appointments</title>
 </head>
 <body>
-<h1>start</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Confirm Appointment</button>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $("#id_specialty").change(function () {
+        var url = "{% url 'ajax_load_doctors' %}";
+        var specialtyId = $(this).val();
+        $.ajax({
+            url: url,
+            data: {
+                'specialty': specialtyId
+            },
+            success: function (data) {
+                $("#id_doctor").html(data);
+            }
+        });
+    });
+
+    $("#id_doctor").change(function () {
+        var url = "{% url 'ajax_load_time_slots' %}";
+        var doctorId = $(this).val();
+        var date = $("#id_date").val();
+        $.ajax({
+            url: url,
+            data: {
+                'doctor': doctorId,
+                'date': date
+            },
+            success: function (data) {
+                $("#id_time_slot").html(data);
+            }
+        });
+    });
+</script>
+
 </body>
 </html>

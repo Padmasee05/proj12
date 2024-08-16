@@ -1,5 +1,5 @@
 from django import forms
-from .models import User, Patient, Doctor
+from .models import User, Patient, Doctor, Appointment
 
 
 class PatientRegistrationForm(forms.ModelForm):
@@ -65,3 +65,13 @@ class AvailabilityForm(forms.Form):
         attrs={'rows': 5, 'placeholder': 'Enter dates (one per line)'}))
     slots = forms.MultipleChoiceField(choices=SLOTS,
                                       widget=forms.CheckboxSelectMultiple)
+
+
+class AppointmentForm(forms.Form):
+    specialty = forms.ChoiceField(choices=[(doc.specialty, doc.specialty) for doc in Doctor.objects.all()])
+    doctor = forms.ModelChoiceField(queryset=Doctor.objects.none())
+    date = forms.DateField(widget=forms.SelectDateWidget)
+    time_slot = forms.ChoiceField(choices=[])
+
+    class Meta:
+        fields = ['specialty', 'doctor', 'date', 'time_slot']

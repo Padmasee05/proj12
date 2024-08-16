@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from .models import User, Patient, Doctor, Appointment, DoctorAvailability
 from django.core.exceptions import ValidationError
 from .forms import PatientRegistrationForm, DoctorRegistrationForm, \
-    AvailabilityForm
+    AvailabilityForm, AppointmentForm
 import datetime
 
 
@@ -189,4 +190,43 @@ def doctor_availability(request):
 
 
 def patient_appointments(request):
-    return render(request, 'appointments.html')
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            doctor = form.cleaned_data['doctor']
+            date = form.cleaned_data['date']
+            time_slot = form.cleaned_data['time_slot']
+            patient = request.user.patient  # Assuming user is logged in as patient
+
+            Appointment.objects.create(
+                doctor=doctor,
+                patient=patient,
+                date=date,
+                time=time_slot,
+                status='pending'
+            )
+
+            return redirect(
+                'patient_appointments')  # Redirect to appointments list page
+    else:
+        form = AppointmentForm()
+
+    return render(request, 'appointments.html', {'form': form})
+
+
+def load_doctors(request):
+    specialty = request.GET.get('specialty')
+    doctors = Doctor.objects.filter(specialty=specialty).all()
+    return JsonResponse(list(doctors.values('id', 'firstname', 'lastname')),
+                        safe=False)
+
+
+def load_time_slots(request):
+    doctor_id = request.GET.get('doctor')
+    date = request.GET.get('date')
+    availability = DoctorAvailability.objects.filter(doctor_id=doctor_id,
+                                                     date=date).all()
+    return JsonResponse(list(availability.values('id', 'slot')), safe=False)
+
+
+
