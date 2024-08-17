@@ -170,23 +170,31 @@ def doctor_dashboard(request):
 
 def doctor_availability(request):
     if request.method == 'POST':
-        dates = request.POST.getlist('dates')
-        slots = request.POST.getlist('slots')
+        form = AvailabilityForm(request.POST)
+        if form.is_valid():
+            dates = form.cleaned_data['dates'].splitlines()
+            slots = form.cleaned_data['slots']
 
-        # Handle saving the availability in your model
-        for date in dates:
-            for slot in slots:
-                DoctorAvailability.objects.create(
-                    doctor=request.user.doctor,
-                    date=date,
-                    slot=slot
-                )
+            # Get the logged-in doctor
+            doctor = Doctor.objects.get(user=request.user)
 
-        # Show a success message
-        messages.success(request, 'Scheduled successfully!')
-        return redirect('doctor_availability')
+            # Process each date and slot
+            for date in dates:
+                for slot in slots:
+                    start_time, end_time = slot.split('-')
+                    # Create a new availability entry
+                    DoctorAvailability.objects.create(
+                        doctor=doctor,
+                        date=date,
+                        slot_start=start_time,
+                        slot_end=end_time
+                    )
 
-    return render(request, 'doctor_availability.html')
+            return redirect('doctor_availability')  # Redirect after saving
+    else:
+        form = AvailabilityForm()
+
+    return render(request, 'doctor_availability.html', {'form': form})
 
 
 def patient_appointments(request):

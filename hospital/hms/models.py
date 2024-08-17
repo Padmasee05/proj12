@@ -120,7 +120,10 @@ class Appointment(models.Model):
 class DoctorAvailability(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     date = models.DateField()
-    slot = models.TimeField()
+    slot_start = models.TimeField(
+        default="09:00")  # Set your default value here
+    slot_end = models.TimeField(default="10:00")  # Set your default value here
 
-    def __str__(self):
-        return f"{self.doctor} - {self.date} - {self.slot}"
+
+def __str__(self):
+        return f"{self.doctor} - {self.date} - {self.slot_start}-{self.slot_end}"
