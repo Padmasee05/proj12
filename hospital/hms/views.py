@@ -199,42 +199,57 @@ def doctor_availability(request):
 
 def patient_appointments(request):
     if request.method == 'POST':
-        form = AppointmentForm(request.POST)
-        if form.is_valid():
-            doctor = form.cleaned_data['doctor']
-            date = form.cleaned_data['date']
-            time_slot = form.cleaned_data['time_slot']
-            patient = request.user.patient  # Assuming user is logged in as patient
+        specialty = request.POST.get('specialty')
+        doctor_name = request.POST.get('doctor_name')
+        selected_date = request.POST.get('date')
+        selected_time_slot = request.POST.get('time_slot')
+        patient = request.user.patient  # Assuming user is logged in as patient
 
-            Appointment.objects.create(
-                doctor=doctor,
+        Appointment.objects.create(
+                doctor=doctor_name,
                 patient=patient,
-                date=date,
-                time=time_slot,
+                date=selected_date,
+                time=selected_time_slot,
                 status='pending'
             )
 
-            return redirect(
-                'patient_appointments')  # Redirect to appointments list page
-    else:
-        form = AppointmentForm()
+        return JsonResponse({'message': 'Appointment booked successfully!'})
 
-    return render(request, 'appointments.html', {'form': form})
+    return render(request, 'appointments.html')
 
 
-def load_doctors(request):
+def get_doctors_by_specialty(request):
     specialty = request.GET.get('specialty')
-    doctors = Doctor.objects.filter(specialty=specialty).all()
-    return JsonResponse(list(doctors.values('id', 'firstname', 'lastname')),
-                        safe=False)
+    doctors = Doctor.objects.filter(specialty=specialty)
+    doctor_list = [{'name': f"{doctor.firstname} {doctor.lastname}"} for
+                   doctor in doctors]
+    return JsonResponse(doctor_list, safe=False)
 
 
-def load_time_slots(request):
-    doctor_id = request.GET.get('doctor')
-    date = request.GET.get('date')
-    availability = DoctorAvailability.objects.filter(doctor_id=doctor_id,
-                                                     date=date).all()
-    return JsonResponse(list(availability.values('id', 'slot')), safe=False)
+def get_availability_by_doctor_date(request):
+    doctor_name = request.GET.get('doctor_name')
+    selected_date = request.GET.get('date')
 
+    # Fetch the doctor
+    try:
+        doctor = Doctor.objects.get(
+            user__email=doctor_name)  # Adjust based on how you identify doctors
+    except Doctor.DoesNotExist:
+        return JsonResponse({'error': 'Doctor not found'}, status=404)
 
+    # Fetch availability slots based on doctor and date
+    availability = DoctorAvailability.objects.filter(
+        doctor=doctor,
+        date=selected_date
+    ).values_list('slot_start', 'slot_end')
+
+    if not availability:
+        return JsonResponse({'message': 'Doctor not available on this date'},
+                            status=404)
+
+    # Format slots as ranges
+    slots = [f"{start_time.strftime('%H:%M')}-{end_time.strftime('%H:%M')}" for
+             start_time, end_time in availability]
+
+    return JsonResponse(slots, safe=False)
 

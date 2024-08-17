@@ -11,8 +11,10 @@ urlpatterns = [
     path('doctor_dashboard/', views.doctor_dashboard, name='doctor_dashboard'),
     path('doctor_availability/', views.doctor_availability, name='doctor_availability'),
     path('patient_appointments/', views.patient_appointments, name='patient_appointments'),
-    path('ajax/load-doctors/', views.load_doctors, name='ajax_load_doctors'),
-    path('ajax/load-time-slots/', views.load_time_slots,
-         name='ajax_load_time_slots'),
+    path('get-doctors-by-specialty/', views.get_doctors_by_specialty,
+         name='get_doctors_by_specialty'),
+    path('get-availability-by-doctor-date/', views.get_availability_by_doctor_date,
+         name='get_availability_by_doctor_date'),
+
 ]
 

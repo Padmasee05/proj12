@@ -1,50 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>appointments</title>
+    <title>Appointments</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Load doctors based on selected specialty
+            $('#specialty').change(function() {
+                var specialty = $(this).val();
+                $.get('/get-doctors-by-specialty/', {specialty: specialty}, function(data) {
+                    $('#doctor').empty();
+                    $.each(data, function(index, doctor) {
+                        $('#doctor').append($('<option>', {
+                            value: doctor.name,
+                            text: doctor.name
+                        }));
+                    });
+                });
+            });
+
+            // Function to update time slots based on selected doctor and date
+           function updateTimeSlots() {
+    var doctor_name = $('#doctor').val();
+    var date = $('#date').val();
+    if (doctor_name && date) {
+        $.get('/get-availability-by-doctor-date/', {doctor_name: doctor_name, date: date}, function(data) {
+            $('#time_slots').empty();
+            if (data.message) {
+                $('#time_slots').append($('<option>', {
+                    value: '',
+                    text: data.message
+                }));
+            } else {
+                $.each(data, function(index, slot) {
+                    $('#time_slots').append($('<option>', {
+                        value: slot,
+                        text: slot
+                    }));
+                });
+            }
+        }).fail(function(jqXHR) {
+            if (jqXHR.status === 404) {
+                $('#time_slots').empty().append($('<option>', {
+                    value: '',
+                    text: 'Doctor not available on this date'
+                }));
+            }
+        });
+    }
+}
+
+
+            // Event handlers to trigger time slot updates
+            $('#doctor').change(updateTimeSlots);
+            $('#date').change(updateTimeSlots);
+        });
+    </script>
 </head>
 <body>
+    <h1>Book an Appointment</h1>
+    <form method="POST" action="{% url 'patient_appointments' %}">
+        {% csrf_token %}
+        <label for="specialty">Select Specialty:</label>
+        <select id="specialty" name="specialty">
+            <option value="">--Select Specialty--</option>
+            <option value="general surgeon">General Surgeon</option>
+            <option value="cardiologist">Cardiologist</option>
+            <option value="dermatologist">Dermatologist</option>
+            <option value="neurologist">Neurologist</option>
+            <option value="orthopedician">Orthopedician</option>
+            <option value="gynecologist">Gynecologist</option>
+        </select>
+        <br>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+        <label for="doctor">Select Doctor:</label>
+        <select id="doctor" name="doctor_name">
+            <!-- Doctors will be populated based on selected specialty -->
+        </select>
+        <br>
 
-    <button type="submit">Confirm Appointment</button>
-</form>
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" name="date">
+        <br>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script type="text/javascript">
-    $("#id_specialty").change(function () {
-        var url = "{% url 'ajax_load_doctors' %}";
-        var specialtyId = $(this).val();
-        $.ajax({
-            url: url,
-            data: {
-                'specialty': specialtyId
-            },
-            success: function (data) {
-                $("#id_doctor").html(data);
-            }
-        });
-    });
+        <label for="time_slots">Select Time Slot:</label>
+        <select id="time_slots" name="time_slot">
+            <!-- Time slots will be populated based on selected doctor and date -->
+        </select>
+        <br>
 
-    $("#id_doctor").change(function () {
-        var url = "{% url 'ajax_load_time_slots' %}";
-        var doctorId = $(this).val();
-        var date = $("#id_date").val();
-        $.ajax({
-            url: url,
-            data: {
-                'doctor': doctorId,
-                'date': date
-            },
-            success: function (data) {
-                $("#id_time_slot").html(data);
-            }
-        });
-    });
-</script>
-
+        <button type="submit">Confirm</button>
+    </form>
 </body>
 </html>
