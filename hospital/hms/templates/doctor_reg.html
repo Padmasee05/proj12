@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Registration</title>
+     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(function() {
+            $("#id_dob").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd', // Format for the date
+                yearRange: "1900:2100" // Range of years
+            });
+        });
+    </script>
     <script>
         function showPopup() {
             var popup = document.getElementById("popup");
@@ -32,30 +45,38 @@
 </head>
 <body>
     <h1>Doctor Registration</h1>
-<!--    <form method="post" action="{% url 'doctor_reg' %}" onsubmit="showPopup(); return false;">-->
-<!--        {% csrf_token %}-->
-<!--        {{ form.as_p }}-->
-<!--        <input type="text" name="title" placeholder="Title" required>-->
-<!--        <input type="text" name="firstname" placeholder="First Name" required>-->
-<!--        <input type="text" name="lastname" placeholder="Last Name" required>-->
-<!--        <input type="date" name="dob" placeholder="Date of Birth" required>-->
-<!--        <input type="text" name="specialty" placeholder="Specialty" required>-->
-<!--        <input type="text" name="phone_number" placeholder="Phone Number" required>-->
-<!--        <button type="submit">Signup</button>-->
-<!--    </form>-->
     <form method="post" action="{% url 'doctor_reg' %}">
-    {% csrf_token %}
-    <input type="text" name="title" placeholder="Title" required>
-    <input type="text" name="firstname" placeholder="First Name" required>
-    <input type="text" name="lastname" placeholder="Last Name" required>
-    <input type="date" name="dob" placeholder="Date of Birth" required>
-    <input type="text" name="specialty" placeholder="Specialty" required>
-    <input type="text" name="phone_number" placeholder="Phone Number" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-    <button type="submit">Signup</button>
-</form>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div>
+            {{ form.title.label_tag }} {{ form.title }}
+        </div>
+        <div>
+            {{ form.firstname.label_tag }} {{ form.firstname }}
+        </div>
+        <div>
+            {{ form.lastname.label_tag }} {{ form.lastname }}
+        </div>
+        <div>
+            {{ form.dob.label_tag }} {{ form.dob }}
+        </div>
+        <div>
+            {{ form.specialty.label_tag }} {{ form.specialty }}
+        </div>
+        <div>
+            {{ form.phone_number.label_tag }} {{ form.phone_number }}
+        </div>
+        <div>
+            {{ form.email.label_tag }} {{ form.email }}
+        </div>
+        <div>
+            {{ form.password.label_tag }} {{ form.password }}
+        </div>
+        <div>
+            {{ form.confirm_password.label_tag }} {{ form.confirm_password }}
+        </div>
+        <button type="submit">Signup</button>
+    </form>
 
     <div id="popup">
         <p>Signup successful!</p>

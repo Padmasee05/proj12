@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Registration</title>
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(function() {
+            $("#id_dob").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd', // Format for the date
+                yearRange: "1900:2100" // Range of years
+            });
+        });
+    </script>
     <script>
         function showPopup() {
             var popup = document.getElementById("popup");
@@ -32,39 +46,11 @@
 </head>
 <body>
     <h1>Patient Registration</h1>
-<!--    <form action="{% url 'patient_reg' %}" method="post">-->
-<!--        {% csrf_token %}-->
-<!--        <label for="title">Title:</label>-->
-<!--        <input type="text" id="title" name="title" required><br>-->
-<!--        <label for="firstname">First Name:</label>-->
-<!--        <input type="text" id="firstname" name="firstname" required><br>-->
-<!--        <label for="lastname">Last Name:</label>-->
-<!--        <input type="text" id="lastname" name="lastname" required><br>-->
-<!--        <label for="dob">Date of Birth:</label>-->
-<!--        <input type="date" id="dob" name="dob" required><br>-->
-<!--        <label for="disease_description">Disease Description:</label>-->
-<!--        <input type="text" id="disease_description" name="disease_description" required><br>-->
-<!--        <label for="phone_number">Phone Number:</label>-->
-<!--        <input type="text" id="phone_number" name="phone_number" required><br>-->
-<!--        <label for="email">Email:</label>-->
-<!--        <input type="email" id="email" name="email" required><br>-->
-<!--        <label for="password">Password:</label>-->
-<!--        <input type="password" id="password" name="password" required><br>-->
-<!--        <label for="confirm_password">Confirm Password:</label>-->
-<!--        <input type="password" id="confirm_password" name="confirm_password" required><br>-->
-<!--        <button type="submit">Signup</button>-->
-<!--    </form>-->
     <form method="post" action="{% url 'patient_reg' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="text" name="firstname" placeholder="First Name" required>
-    <input type="text" name="lastname" placeholder="Last Name" required>
-    <input type="date" name="dob" placeholder="Date of Birth" required>
-    <textarea name="disease_description" placeholder="Disease Description" required></textarea>
-    <input type="text" name="phone_number" placeholder="Phone Number" required>
-    <input type="text" name="title" placeholder="Title" required>
-    <button type="submit">Register</button>
-</form>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
 
     <div id="popup">
         <p>Signup successful!</p>

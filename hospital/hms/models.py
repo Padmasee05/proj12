@@ -60,7 +60,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=30)
+    TITLE_CHOICES = [
+        ('Mr', 'Mr.'),
+        ('Ms', 'Ms.'),
+        ('Mrs', 'Mrs.'),
+        ('Dr', 'Dr.'),
+        ('Prof', 'Prof.'),
+    ]
+    title = models.CharField(max_length=30, choices=TITLE_CHOICES)
     firstname = models.CharField(max_length=30)
     lastname = models.CharField(max_length=30)
     dob = models.DateField()
@@ -73,11 +80,24 @@ class Patient(models.Model):
 
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=30)
+    TITLE_CHOICES = [
+        ('Mr', 'Mr.'),
+        ('Ms', 'Ms.'),
+        ('Mrs', 'Mrs.'),
+        ('Dr', 'Dr.'),
+        ('Prof', 'Prof.'),
+    ]
+    title = models.CharField(max_length=30, choices=TITLE_CHOICES)
     firstname = models.CharField(max_length=30)
     lastname = models.CharField(max_length=30)
     dob = models.DateField()
-    specialty = models.CharField(max_length=100)
+    speciality_choice = [('general surgeon', 'General Surgeon'),
+                         ('cardiologist', 'Cardiologist'),
+                         ('dermatologist', 'Dermatologist'),
+                         ('neurologist', 'Neurologist'),
+                         ('orthopedician', 'Orthopedician'),
+                         ('gynecologist', 'Gynecologist'),]
+    specialty = models.CharField(max_length=100, choices=speciality_choice)
     phone_number = models.CharField(max_length=15)
 
     def __str__(self):
