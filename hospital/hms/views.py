@@ -246,7 +246,8 @@ def patient_appointments(request):
             status='pending'
         )
 
-        return JsonResponse({'message': 'Appointment booked successfully!'})
+        messages.success(request, 'Appointment booked successfully!')
+        return redirect('patient_appointments')
 
     return render(request, 'appointments.html')
 

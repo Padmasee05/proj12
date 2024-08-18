@@ -4,8 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Registration</title>
-     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #007bff;
+        }
+        .navbar a {
+            color: #ffffff;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #007bff;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .popup button {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
@@ -13,48 +52,40 @@
             $("#id_dob").datepicker({
                 changeMonth: true,
                 changeYear: true,
-                dateFormat: 'yy-mm-dd', // Format for the date
-                yearRange: "1900:2100" // Range of years
+                dateFormat: 'yy-mm-dd',
+                yearRange: "1900:2100"
             });
         });
-    </script>
-    <script>
+
         function showPopup() {
-            var popup = document.getElementById("popup");
-            popup.style.display = "block";
+            document.querySelector(".popup").style.display = "block";
         }
 
         function closePopup() {
-            var popup = document.getElementById("popup");
-            popup.style.display = "none";
+            document.querySelector(".popup").style.display = "none";
             window.location.href = "{% url 'homepage' %}";
         }
     </script>
-    <style>
-        #popup {
-            display: none;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            border: 1px solid #000;
-            padding: 10px;
-            background-color: #fff;
-            z-index: 1000;
-        }
-    </style>
 </head>
 <body>
-    <h1>Patient Registration</h1>
-    <form method="post" action="{% url 'patient_reg' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
-    </form>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="{% url 'patient_welcome' %}">Hospital Management System</a>
+    </nav>
 
-    <div id="popup">
+    <div class="container">
+        <div class="card">
+            <h2 class="text-center mb-4">Patient Registration</h2>
+            <form method="post" action="{% url 'patient_reg' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="popup">
         <p>Signup successful!</p>
-        <button onclick="closePopup()">OK</button>
+        <button class="btn btn-primary" onclick="closePopup()">OK</button>
     </div>
 </body>
 </html>

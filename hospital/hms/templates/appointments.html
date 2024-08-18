@@ -1,8 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Appointments</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book an Appointment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script>
     $(document).ready(function() {
         // Load doctors based on selected specialty
@@ -58,6 +64,21 @@
         // Event handlers to trigger time slot updates
         $('#doctor').change(updateTimeSlots);
         $('#date').change(updateTimeSlots);
+
+        // Initialize Bootstrap date picker
+        $('#date').datepicker({
+            format: 'yyyy-mm-dd',
+            startDate: 'today',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        // Show success message if present
+        {% if messages %}
+            {% for message in messages %}
+                alert("{{ message }}");
+            {% endfor %}
+        {% endif %}
     });
 
     function confirmLogout(event) {
@@ -67,48 +88,112 @@
         }
     }
     </script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #007bff;
+        }
+        .navbar a {
+            color: #ffffff;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            padding: 12px; /* Increased padding */
+            font-size: 16px; /* Increased font size */
+            box-sizing: border-box; /* Ensure padding and border are included in the total width and height */
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+        }
+        select.form-control {
+            height: auto; /* Ensure the select box height is sufficient */
+        }
+        input[type="date"].form-control {
+            height: auto; /* Ensure the date input box height is sufficient */
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav>
-        <ul>
-            <li><a href="{% url 'patient_welcome' %}">Home</a></li>
-            <li><a href="{% url 'logout' %}" onclick="confirmLogout(event)">Logout</a></li>
-        </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="{% url 'patient_welcome' %}">Hospital Management System</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'patient_welcome' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}" onclick="confirmLogout(event)">Logout</a>
+                </li>
+            </ul>
+        </div>
     </nav>
 
-    <h1>Book an Appointment</h1>
-    <form method="POST" action="{% url 'patient_appointments' %}">
-        {% csrf_token %}
-        <label for="specialty">Select Specialty:</label>
-        <select id="specialty" name="specialty">
-            <option value="">--Select Specialty--</option>
-            <option value="general surgeon">General Surgeon</option>
-            <option value="cardiologist">Cardiologist</option>
-            <option value="dermatologist">Dermatologist</option>
-            <option value="neurologist">Neurologist</option>
-            <option value="orthopedician">Orthopedician</option>
-            <option value="gynecologist">Gynecologist</option>
-        </select>
-        <br>
+    <div class="container">
+        <div class="card">
+            <h2 class="text-center mb-4">Book an Appointment</h2>
+            <form method="POST" action="{% url 'patient_appointments' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="specialty">Select Specialty:</label>
+                    <select id="specialty" name="specialty" class="form-control">
+                        <option value="">--Select Specialty--</option>
+                        <option value="general surgeon">General Surgeon</option>
+                        <option value="cardiologist">Cardiologist</option>
+                        <option value="dermatologist">Dermatologist</option>
+                        <option value="neurologist">Neurologist</option>
+                        <option value="orthopedician">Orthopedician</option>
+                        <option value="gynecologist">Gynecologist</option>
+                    </select>
+                </div>
 
-        <label for="doctor">Select Doctor:</label>
-        <select id="doctor" name="doctor_name">
-            <!-- Doctors will be populated based on selected specialty -->
-        </select>
-        <br>
+                <div class="form-group">
+                    <label for="doctor">Select Doctor:</label>
+                    <select id="doctor" name="doctor_name" class="form-control">
+                        <!-- Doctors will be populated based on selected specialty -->
+                    </select>
+                </div>
 
-        <label for="date">Select Date:</label>
-        <input type="date" id="date" name="date">
-        <br>
+                <div class="form-group">
+                    <label for="date">Select Date:</label>
+                    <input type="text" id="date" name="date" class="form-control">
+                </div>
 
-        <label for="time_slots">Select Time Slot:</label>
-        <select id="time_slots" name="time_slot">
-            <!-- Time slots will be populated based on selected doctor and date -->
-        </select>
-        <br>
+                <div class="form-group">
+                    <label for="time_slots">Select Time Slot:</label>
+                    <select id="time_slots" name="time_slot" class="form-control">
+                        <!-- Time slots will be populated based on selected doctor and date -->
+                    </select>
+                </div>
 
-        <button type="submit">Confirm</button>
-    </form>
+                <button type="submit" class="btn btn-primary btn-block">Confirm</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
