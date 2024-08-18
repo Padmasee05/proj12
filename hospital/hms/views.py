@@ -150,15 +150,28 @@ def patient_welcome_view(request):
 
 
 def doctor_dashboard(request):
-    # Calculate total patients
-    total_patients = Patient.objects.count()
+    # Get the logged-in doctor's instance
+    today = datetime.date.today()
 
-    # Assuming that "pending patients" are those who have a pending appointment
-    pending_patients = Appointment.objects.filter(status='pending',
-                                                  doctor=request.user.doctor)
+    # Calculate total patients who have appointments from today onward
+    total_patients = Appointment.objects.filter(
+        doctor=request.user.doctor,
+        date__gte=today
+    ).values('patient').distinct().count()
 
+    # Pending patients are those with a pending appointment status
+    pending_patients = Appointment.objects.filter(
+        status='pending',
+        doctor=request.user.doctor,
+        date__gte=today
+        # To ensure only upcoming pending appointments are shown
+    )
+
+    # Today's appointments
     todays_appointments = Appointment.objects.filter(
-        date=datetime.date.today(), doctor=request.user.doctor)
+        date=today,
+        doctor=request.user.doctor
+    )
 
     context = {
         'total_patients': total_patients,
@@ -267,21 +280,5 @@ def get_availability_by_doctor_date(request):
     return JsonResponse(slots, safe=False)
 
 
-# def fetch_time_slots(request):
-#     date = request.GET.get('date')  # Get the selected date
-#     doctor_id = request.GET.get('doctor_id')  # Get the selected doctor ID
-#
-#     if date and doctor_id:
-#         # Fetch availability for the given doctor and date
-#         availability = DoctorAvailability.objects.filter(
-#             doctor_id=doctor_id,
-#             date=date
-#         ).values_list('slot_start', 'slot_end')
-#
-#         # Convert to a list of strings in "HH:MM-HH:MM" format
-#         slots = [f"{start.strftime('%H:%M')}-{end.strftime('%H:%M')}" for start, end in availability]
-#
-#         return JsonResponse({'slots': slots})
-#     return JsonResponse({'slots': []})
-#
+
 
