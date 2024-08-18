@@ -4,58 +4,63 @@
     <title>Appointments</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            // Load doctors based on selected specialty
-            $('#specialty').change(function() {
-                var specialty = $(this).val();
-                $.get('/get-doctors-by-specialty/', {specialty: specialty}, function(data) {
-                    $('#doctor').empty();
-                    $.each(data, function(index, doctor) {
-                        $('#doctor').append($('<option>', {
-                            value: doctor.name,
-                            text: doctor.name
-                        }));
-                    });
-                });
-            });
-
-            // Function to update time slots based on selected doctor and date
-           function updateTimeSlots() {
-    var doctor_name = $('#doctor').val();
-    var date = $('#date').val();
-    if (doctor_name && date) {
-        $.get('/get-availability-by-doctor-date/', {doctor_name: doctor_name, date: date}, function(data) {
-            $('#time_slots').empty();
-            if (data.message) {
-                $('#time_slots').append($('<option>', {
-                    value: '',
-                    text: data.message
-                }));
-            } else {
-                $.each(data, function(index, slot) {
-                    $('#time_slots').append($('<option>', {
-                        value: slot,
-                        text: slot
+    $(document).ready(function() {
+        // Load doctors based on selected specialty
+        $('#specialty').change(function() {
+            var specialty = $(this).val();
+            $.get('/get-doctors-by-specialty/', {specialty: specialty}, function(data) {
+                $('#doctor').empty();
+                $.each(data, function(index, doctor) {
+                    $('#doctor').append($('<option>', {
+                        value: doctor.name,
+                        text: doctor.name
                     }));
                 });
-            }
-        }).fail(function(jqXHR) {
-            if (jqXHR.status === 404) {
+                // Clear and reset time slots when specialty changes
                 $('#time_slots').empty().append($('<option>', {
                     value: '',
-                    text: 'Doctor not available on this date'
+                    text: 'Select a doctor and date first'
                 }));
+            });
+        });
+
+        // Function to update time slots based on selected doctor and date
+        function updateTimeSlots() {
+            var doctor_name = $('#doctor').val();
+            var date = $('#date').val();
+            if (doctor_name && date) {
+                $.get('/get-availability-by-doctor-date/', {doctor_name: doctor_name, date: date}, function(data) {
+                    $('#time_slots').empty();
+                    if (data.message) {
+                        $('#time_slots').append($('<option>', {
+                            value: '',
+                            text: data.message
+                        }));
+                    } else {
+                        $.each(data, function(index, slot) {
+                            $('#time_slots').append($('<option>', {
+                                value: slot,
+                                text: slot
+                            }));
+                        });
+                    }
+                }).fail(function(jqXHR) {
+                    if (jqXHR.status === 404) {
+                        $('#time_slots').empty().append($('<option>', {
+                            value: '',
+                            text: 'Doctor not available on this date'
+                        }));
+                    }
+                });
             }
-        });
-    }
-}
+        }
 
+        // Event handlers to trigger time slot updates
+        $('#doctor').change(updateTimeSlots);
+        $('#date').change(updateTimeSlots);
+    });
+</script>
 
-            // Event handlers to trigger time slot updates
-            $('#doctor').change(updateTimeSlots);
-            $('#date').change(updateTimeSlots);
-        });
-    </script>
 </head>
 <body>
     <h1>Book an Appointment</h1>

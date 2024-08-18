@@ -205,13 +205,24 @@ def patient_appointments(request):
         selected_time_slot = request.POST.get('time_slot')
         patient = request.user.patient  # Assuming user is logged in as patient
 
+        # Split the doctor's name to extract firstname and lastname
+        first_name, last_name = doctor_name.split()
+
+        # Fetch the Doctor instance
+        try:
+            doctor = Doctor.objects.get(firstname=first_name,
+                                        lastname=last_name)
+        except Doctor.DoesNotExist:
+            return JsonResponse({'error': 'Doctor not found'}, status=404)
+
+        # Create the appointment
         Appointment.objects.create(
-                doctor=doctor_name,
-                patient=patient,
-                date=selected_date,
-                time=selected_time_slot,
-                status='pending'
-            )
+            doctor=doctor,
+            patient=patient,
+            date=selected_date,
+            time=selected_time_slot,
+            status='pending'
+        )
 
         return JsonResponse({'message': 'Appointment booked successfully!'})
 
@@ -230,10 +241,12 @@ def get_availability_by_doctor_date(request):
     doctor_name = request.GET.get('doctor_name')
     selected_date = request.GET.get('date')
 
-    # Fetch the doctor
+    # Fetch the doctor based on the name
     try:
         doctor = Doctor.objects.get(
-            user__email=doctor_name)  # Adjust based on how you identify doctors
+            firstname__iexact=doctor_name.split()[0],
+            lastname__iexact=doctor_name.split()[1]
+        )
     except Doctor.DoesNotExist:
         return JsonResponse({'error': 'Doctor not found'}, status=404)
 
@@ -252,4 +265,23 @@ def get_availability_by_doctor_date(request):
              start_time, end_time in availability]
 
     return JsonResponse(slots, safe=False)
+
+
+# def fetch_time_slots(request):
+#     date = request.GET.get('date')  # Get the selected date
+#     doctor_id = request.GET.get('doctor_id')  # Get the selected doctor ID
+#
+#     if date and doctor_id:
+#         # Fetch availability for the given doctor and date
+#         availability = DoctorAvailability.objects.filter(
+#             doctor_id=doctor_id,
+#             date=date
+#         ).values_list('slot_start', 'slot_end')
+#
+#         # Convert to a list of strings in "HH:MM-HH:MM" format
+#         slots = [f"{start.strftime('%H:%M')}-{end.strftime('%H:%M')}" for start, end in availability]
+#
+#         return JsonResponse({'slots': slots})
+#     return JsonResponse({'slots': []})
+#
 

@@ -16,5 +16,6 @@ urlpatterns = [
     path('get-availability-by-doctor-date/', views.get_availability_by_doctor_date,
          name='get_availability_by_doctor_date'),
 
+
 ]
 
