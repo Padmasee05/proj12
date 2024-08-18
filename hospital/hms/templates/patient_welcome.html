@@ -4,9 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Welcome</title>
-{% load static %}
-
+    {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script>
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.href = event.target.href;
+            }
+        }
+    </script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -14,6 +21,7 @@
         <ul>
             <li><a href="{% url 'patient_welcome' %}">Home</a></li>
             <li><a href="{% url 'patient_appointments' %}">Appointments</a></li>
+            <li><a href="{% url 'logout' %}" onclick="confirmLogout(event)">Logout</a></li>
         </ul>
     </nav>
 

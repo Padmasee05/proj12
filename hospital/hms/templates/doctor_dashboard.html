@@ -2,12 +2,21 @@
 <html>
 <head>
     <title>Doctor Dashboard</title>
+    <script>
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.href = event.target.href;
+            }
+        }
+    </script>
 </head>
 <body>
     <nav>
         <ul>
             <li><a href="{% url 'doctor_dashboard' %}">Home</a></li>
             <li><a href="{% url 'doctor_availability' %}">Availability</a></li>
+            <li><a href="{% url 'logout' %}" onclick="confirmLogout(event)">Logout</a></li>
         </ul>
     </nav>
 

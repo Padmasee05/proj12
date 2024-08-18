@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from .models import User, Patient, Doctor, Appointment, DoctorAvailability
 from django.core.exceptions import ValidationError
 from .forms import PatientRegistrationForm, DoctorRegistrationForm, \
@@ -28,6 +28,10 @@ def homepage(request):
             else:
                 messages.error(request, 'Invalid email or password.')
     return render(request, 'homepage.html')
+
+
+def admin_page(request):
+    return render(request, 'admin_page.html')
 
 
 def login_view(request):
@@ -179,6 +183,11 @@ def doctor_dashboard(request):
         'todays_appointments': todays_appointments,
     }
     return render(request, 'doctor_dashboard.html', context)
+
+
+def user_logout(request):
+    logout(request)
+    return redirect('homepage')
 
 
 def doctor_availability(request):

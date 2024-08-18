@@ -59,10 +59,24 @@
         $('#doctor').change(updateTimeSlots);
         $('#date').change(updateTimeSlots);
     });
-</script>
 
+    function confirmLogout(event) {
+        event.preventDefault();
+        if (confirm("Are you sure you want to logout?")) {
+            window.location.href = event.target.href;
+        }
+    }
+    </script>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav>
+        <ul>
+            <li><a href="{% url 'patient_welcome' %}">Home</a></li>
+            <li><a href="{% url 'logout' %}" onclick="confirmLogout(event)">Logout</a></li>
+        </ul>
+    </nav>
+
     <h1>Book an Appointment</h1>
     <form method="POST" action="{% url 'patient_appointments' %}">
         {% csrf_token %}

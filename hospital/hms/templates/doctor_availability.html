@@ -21,9 +21,35 @@
         .slot-checkboxes input {
             margin-right: 10px;
         }
+        /* Navigation bar styling */
+        nav {
+            background-color: #f4f4f4;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 15px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav>
+        <ul>
+            <li><a href="{% url 'doctor_dashboard' %}">Home</a></li>
+            <li><a href="{% url 'logout' %}" onclick="confirmLogout(event)">Logout</a></li>
+        </ul>
+    </nav>
+
     <h1>Mark Availability</h1>
     <form method="post" action="{% url 'doctor_availability' %}">
         {% csrf_token %}
@@ -67,6 +93,13 @@
             var popup = document.getElementById("popup");
             popup.style.display = "none";
             window.location.href = "{% url 'doctor_dashboard' %}";
+        }
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.href = event.target.href;
+            }
         }
     </script>
 </body>
