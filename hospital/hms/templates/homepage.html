@@ -54,10 +54,6 @@
         .login-card .btn-primary:hover {
             background-color: #0056b3;
         }
-        .message-box {
-            max-width: 500px;
-            margin: 20px auto;
-        }
         .footer {
             background-color: #007bff;
             color: #fff;
@@ -115,13 +111,26 @@
         </div>
 
         {% if messages %}
-            <div class="message-box alert alert-info">
-                <ul class="mb-0">
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
+        <!-- Error Modal -->
+        <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="errorModalLabel">Login Error</h5>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="mb-0">
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    </div>
+                </div>
             </div>
+        </div>
         {% endif %}
     </div>
 
@@ -131,5 +140,12 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Show the modal if there are messages
+        {% if messages %}
+        var errorModal = new bootstrap.Modal(document.getElementById('errorModal'), {});
+        errorModal.show();
+        {% endif %}
+    </script>
 </body>
 </html>
