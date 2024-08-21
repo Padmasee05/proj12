@@ -44,6 +44,10 @@
             background-color: #007bff;
             color: #ffffff;
         }
+        .popup .error-messages {
+            color: red;
+            margin-bottom: 15px;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -55,15 +59,30 @@
                 dateFormat: 'yy-mm-dd',
                 yearRange: "1900:2100"
             });
+
+            {% if form.errors %}
+                var errors = "{{ form.errors.as_text|escapejs }}";
+                if (errors) {
+                    showPopup(errors, true);
+                }
+            {% endif %}
+
+            {% if success %}
+                showPopup('Signup successful!', false);
+                setTimeout(function() {
+                    window.location.href = "{% url 'homepage' %}";
+                }, 3000); // Redirect after 3 seconds
+            {% endif %}
         });
 
-        function showPopup() {
-            document.querySelector(".popup").style.display = "block";
+        function showPopup(message, isError) {
+            var popup = document.querySelector(".popup");
+            popup.innerHTML = "<div class='" + (isError ? "error-messages" : "") + "'>" + message + "</div><button class='btn btn-primary' onclick='closePopup()'>OK</button>";
+            popup.style.display = "block";
         }
 
         function closePopup() {
             document.querySelector(".popup").style.display = "none";
-            window.location.href = "{% url 'homepage' %}";
         }
     </script>
 </head>
@@ -83,9 +102,6 @@
         </div>
     </div>
 
-    <div class="popup">
-        <p>Signup successful!</p>
-        <button class="btn btn-primary" onclick="closePopup()">OK</button>
-    </div>
+    <div class="popup"></div>
 </body>
 </html>

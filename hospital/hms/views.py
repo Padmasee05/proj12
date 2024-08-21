@@ -99,12 +99,12 @@ def patient_reg_view(request):
         if form.is_valid():
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
-            firstname = request.POST.get('firstname')
-            lastname = request.POST.get('lastname')
-            dob = request.POST.get('dob')
-            disease_description = request.POST.get('disease_description')
-            phone_number = request.POST.get('phone_number')
-            title = request.POST.get('title')
+            firstname = form.cleaned_data.get('firstname')
+            lastname = form.cleaned_data.get('lastname')
+            dob = form.cleaned_data.get('dob')
+            disease_description = form.cleaned_data.get('disease_description')
+            phone_number = form.cleaned_data.get('phone_number')
+            title = form.cleaned_data.get('title')
 
             user = User.objects.create_user(
                 email=email,
@@ -122,10 +122,10 @@ def patient_reg_view(request):
                 phone_number=phone_number
             )
 
-            messages.success(request, 'Signup successful!')
-            return redirect('homepage')
+            return render(request, 'patient_reg.html',
+                          {'form': form, 'success': True})
         else:
-            messages.error(request, 'Please correct the errors below.')
+            return render(request, 'patient_reg.html', {'form': form})
     else:
         form = PatientRegistrationForm()
 
