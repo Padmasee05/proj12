@@ -65,13 +65,15 @@
             }
         });
 
-        // Show success message if present
-        {% if messages %}
-            {% for message in messages %}
-                $('#message').text("{{ message }}").show();
-            {% endfor %}
-        {% endif %}
+
     });
+         function confirmLogout(event) {
+        event.preventDefault();
+        var logout = confirm("Are you sure you want to log out?");
+        if (logout) {
+            window.location.href = "{% url 'logout' %}";
+        }
+    }
     </script>
     <style>
         #message {
@@ -84,8 +86,8 @@
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+     <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" href="{% url 'patient_welcome' %}">Hospital Management System</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
@@ -93,13 +95,21 @@
                     <a class="nav-link" href="{% url 'patient_welcome' %}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}" onclick="confirmLogout(event)">Logout</a>
+                    <a class="nav-link" href="#" onclick="confirmLogout(event)">Logout</a>
                 </li>
             </ul>
         </div>
     </nav>
-
+    <hr>
     <div class="container">
+        <!-- Message Display -->
+        {% if messages %}
+            <div class="alert alert-info" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="card">
             <h2 class="text-center mb-4">Reschedule Appointment</h2>
             <form method="POST" action="{% url 'reschedule_appointment' %}">
@@ -134,8 +144,7 @@
 
                 <button type="submit" class="btn btn-primary btn-block">Reschedule</button>
 
-                <!-- Message display area -->
-                <div id="message" class="alert alert-success"></div>
+
             </form>
         </div>
     </div>

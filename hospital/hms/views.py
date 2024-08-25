@@ -309,12 +309,12 @@ def reschedule_appointment(request):
             appointment.date = new_date
             appointment.time = new_time_slot
             appointment.save()
-            messages.success(request, 'Appointment rescheduled successfully!')
+            messages.success(request, 'Appointment rescheduled successfully.')
         except Appointment.DoesNotExist:
             messages.error(request, 'Appointment not found.')
 
         # Redirect to patient_welcome page after processing POST request
-        return redirect('patient_welcome')
+        return redirect('reschedule_appointment')
 
         # Handle GET request to display the reschedule form
     patient = request.user.patient
