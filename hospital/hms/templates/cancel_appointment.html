@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Your existing head content -->
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <!-- Your existing navbar content -->
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2 class="text-center mb-4">Cancel Appointment</h2>
+            <form method="POST" action="{% url 'cancel_appointment' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="appointment_id">Appointment ID:</label>
+                    <input type="text" id="appointment_id" name="appointment_id" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-danger btn-block">Cancel Appointment</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

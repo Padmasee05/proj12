@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reschedule Appointment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Initialize Bootstrap date picker
+        $('#new_date').datepicker({
+            format: 'yyyy-mm-dd',
+            startDate: 'today',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        // Update doctor name when appointment ID changes
+        $('#appointment_id').change(function() {
+            var selectedAppointment = $(this).find('option:selected').text();
+            var parts = selectedAppointment.split(' - ');
+
+            if (parts.length >= 4) {
+                var doctorName = parts.slice(3).join(' '); // Combine all parts from the 4th onwards
+                $('#doctor_name').val(doctorName);
+            } else {
+                $('#doctor_name').val('');
+            }
+        });
+
+        // Fetch available slots based on selected doctor and date
+        $('#new_date').change(function() {
+            var selectedDate = $(this).val();
+            var doctorName = $('#doctor_name').val();
+
+            if (selectedDate && doctorName) {
+                $.ajax({
+                    url: '{% url "get_availability_by_doctor_date" %}',
+                    data: {
+                        'doctor_name': doctorName,
+                        'date': selectedDate
+                    },
+                    success: function(data) {
+                        if (data.length) {
+                            $('#time_slot_div').show();
+                            $('#time_slot').empty();
+                            $.each(data, function(index, slot) {
+                                $('#time_slot').append('<option value="' + slot + '">' + slot + '</option>');
+                            });
+                        } else {
+                            $('#time_slot_div').hide();
+                            $('#message').text('Doctor not available on this date. Please select a different date.').show();
+                        }
+                    },
+                    error: function() {
+                        $('#message').text('Error retrieving availability.').show();
+                    }
+                });
+            } else {
+                $('#time_slot_div').hide();
+            }
+        });
+
+        // Show success message if present
+        {% if messages %}
+            {% for message in messages %}
+                $('#message').text("{{ message }}").show();
+            {% endfor %}
+        {% endif %}
+    });
+    </script>
+    <style>
+        #message {
+            display: none;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="{% url 'patient_welcome' %}">Hospital Management System</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'patient_welcome' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}" onclick="confirmLogout(event)">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2 class="text-center mb-4">Reschedule Appointment</h2>
+            <form method="POST" action="{% url 'reschedule_appointment' %}">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="appointment_id">Select Appointment ID:</label>
+                    <select id="appointment_id" name="appointment_id" class="form-control" required>
+                        <option value="">--Select Appointment--</option>
+                        {% for appointment in upcoming_appointments %}
+                            <option value="{{ appointment.id }}">{{ appointment.id }} - {{ appointment.date }} - {{ appointment.time }} - {{ appointment.doctor.firstname }} {{ appointment.doctor.lastname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="doctor_name">Doctor's Name:</label>
+                    <input type="text" id="doctor_name" name="doctor_name" class="form-control" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_date">New Date:</label>
+                    <input type="text" id="new_date" name="new_date" class="form-control">
+                </div>
+
+                <div id="time_slot_div" class="form-group" style="display:none;">
+                    <label for="time_slot">New Time Slot:</label>
+                    <select id="time_slot" name="new_time_slot" class="form-control">
+                        <option value="">--Select Time Slot--</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Reschedule</button>
+
+                <!-- Message display area -->
+                <div id="message" class="alert alert-success"></div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from .forms import PatientRegistrationForm, DoctorRegistrationForm, \
     AvailabilityForm, AppointmentForm
 import datetime
+from django.utils import timezone
 
 
 def homepage(request):
@@ -296,5 +297,51 @@ def get_availability_by_doctor_date(request):
     return JsonResponse(slots, safe=False)
 
 
+def reschedule_appointment(request):
+    if request.method == 'POST':
+        appointment_id = request.POST.get('appointment_id')
+        new_date = request.POST.get('new_date')
+        new_time_slot = request.POST.get('new_time_slot')
+
+        try:
+            appointment = Appointment.objects.get(id=appointment_id,
+                                                  patient=request.user.patient)
+            appointment.date = new_date
+            appointment.time = new_time_slot
+            appointment.save()
+            messages.success(request, 'Appointment rescheduled successfully!')
+        except Appointment.DoesNotExist:
+            messages.error(request, 'Appointment not found.')
+
+        # Redirect to patient_welcome page after processing POST request
+        return redirect('patient_welcome')
+
+        # Handle GET request to display the reschedule form
+    patient = request.user.patient
+    upcoming_appointments = Appointment.objects.filter(patient=patient,
+                                                       date__gte=timezone.now().date())
+
+    # Extract the doctor’s name for each appointment
+    for appointment in upcoming_appointments:
+        appointment.doctor_name = f"{appointment.doctor.firstname} {appointment.doctor.lastname}"
+
+    return render(request, 'reschedule_appointment.html',
+                  {'upcoming_appointments': upcoming_appointments})
 
 
+def cancel_appointment(request):
+    if request.method == 'POST':
+        # Your logic to handle the cancellation
+        appointment_id = request.POST.get('appointment_id')
+
+        try:
+            appointment = Appointment.objects.get(id=appointment_id)
+            appointment.delete()
+            messages.success(request, 'Appointment cancelled successfully!')
+        except Appointment.DoesNotExist:
+            messages.error(request, 'Appointment not found.')
+
+        return redirect('patient_appointments')
+
+    # Render a form to confirm cancellation
+    return render(request, 'cancel_appointment.html')

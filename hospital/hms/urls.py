@@ -17,7 +17,8 @@ urlpatterns = [
          name='get_doctors_by_specialty'),
     path('get-availability-by-doctor-date/', views.get_availability_by_doctor_date,
          name='get_availability_by_doctor_date'),
-
+    path('reschedule/', views.reschedule_appointment, name='reschedule_appointment'),
+    path('cancel/', views.cancel_appointment, name='cancel_appointment'),
 
 ]
 
