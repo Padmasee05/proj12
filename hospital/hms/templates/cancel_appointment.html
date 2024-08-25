@@ -1,26 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Your existing head content -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Appointment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <style>
+        #message {
+            display: none;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <!-- Your existing navbar content -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="{% url 'patient_welcome' %}">Hospital Management System</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'patient_welcome' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="confirmLogout(event)">Logout</a>
+                </li>
+            </ul>
+        </div>
     </nav>
-
+    <hr>
     <div class="container">
+        <!-- Message Display -->
+        {% if messages %}
+            <div class="alert alert-info" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="card">
             <h2 class="text-center mb-4">Cancel Appointment</h2>
             <form method="POST" action="{% url 'cancel_appointment' %}">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="appointment_id">Appointment ID:</label>
-                    <input type="text" id="appointment_id" name="appointment_id" class="form-control" required>
+                    <label>Select Appointment to Cancel:</label>
+                    <ul class="list-group">
+                        {% for appointment in upcoming_appointments %}
+                        <li class="list-group-item">
+                            <!-- Generate a unique ID for each radio button -->
+                            <input type="radio" id="appointment_{{ appointment.id }}" name="appointment_id" value="{{ appointment.id }}" required>
+                            <label for="appointment_{{ appointment.id }}">
+                                Appointment ID: {{ appointment.id }} | Date: {{ appointment.date }} | Doctor: {{ appointment.doctor.firstname }} {{ appointment.doctor.lastname }} | Time Slot: {{ appointment.time_slot }}
+                            </label>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No upcoming appointments found.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
                 <button type="submit" class="btn btn-danger btn-block">Cancel Appointment</button>
             </form>
         </div>
     </div>
+
+    <script>
+        function confirmLogout(event) {
+            event.preventDefault();
+            var logout = confirm("Are you sure you want to log out?");
+            if (logout) {
+                window.location.href = "{% url 'logout' %}";
+            }
+        }
+    </script>
 </body>
 </html>

@@ -329,19 +329,35 @@ def reschedule_appointment(request):
                   {'upcoming_appointments': upcoming_appointments})
 
 
+@login_required
 def cancel_appointment(request):
+    user = request.user
+
+    try:
+        # Fetch the corresponding Patient instance
+        patient = Patient.objects.get(user=user)
+    except Patient.DoesNotExist:
+        messages.error(request, 'Patient not found.')
+        return redirect('patient_appointments')
+
     if request.method == 'POST':
-        # Your logic to handle the cancellation
+        # Logic to handle the cancellation
         appointment_id = request.POST.get('appointment_id')
 
         try:
-            appointment = Appointment.objects.get(id=appointment_id)
+            appointment = Appointment.objects.get(id=appointment_id, patient=patient)
             appointment.delete()
             messages.success(request, 'Appointment cancelled successfully!')
         except Appointment.DoesNotExist:
             messages.error(request, 'Appointment not found.')
 
-        return redirect('patient_appointments')
+        return redirect('cancel_appointment')
 
-    # Render a form to confirm cancellation
-    return render(request, 'cancel_appointment.html')
+    # Retrieve upcoming appointments for the patient
+    upcoming_appointments = Appointment.objects.filter(
+        patient=patient, date__gte=timezone.now()
+    ).order_by('date')
+
+    return render(request, 'cancel_appointment.html', {
+        'upcoming_appointments': upcoming_appointments
+    })
