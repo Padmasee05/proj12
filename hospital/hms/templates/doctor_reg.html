@@ -18,16 +18,26 @@
             });
         });
 
-        function showPopup() {
+        function showPopup(message, redirectUrl = null) {
             var popup = document.getElementById("popup");
+            document.getElementById("popup-message").innerText = message;
             popup.style.display = "block";
+
+            // Close the popup and redirect if provided
+            document.getElementById("popup-button").onclick = function() {
+                popup.style.display = "none";
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            };
         }
 
-        function closePopup() {
-            var popup = document.getElementById("popup");
-            popup.style.display = "none";
-            window.location.href = "{% url 'homepage' %}";
-        }
+        // Trigger popup if success is True
+        {% if success %}
+        $(document).ready(function() {
+            showPopup("Signup successful!", "{% url 'homepage' %}");
+        });
+        {% endif %}
     </script>
     <style>
         body {
@@ -77,6 +87,9 @@
         .form-group {
             margin-bottom: 15px;
         }
+        .errorlist {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -92,38 +105,47 @@
             {{ form.non_field_errors }}
             <div class="form-group">
                 {{ form.title.label_tag }} {{ form.title }}
+                {{ form.title.errors }}
             </div>
             <div class="form-group">
                 {{ form.firstname.label_tag }} {{ form.firstname }}
+                {{ form.firstname.errors }}
             </div>
             <div class="form-group">
                 {{ form.lastname.label_tag }} {{ form.lastname }}
+                {{ form.lastname.errors }}
             </div>
             <div class="form-group">
                 {{ form.dob.label_tag }} {{ form.dob }}
+                {{ form.dob.errors }}
             </div>
             <div class="form-group">
                 {{ form.specialty.label_tag }} {{ form.specialty }}
+                {{ form.specialty.errors }}
             </div>
             <div class="form-group">
                 {{ form.phone_number.label_tag }} {{ form.phone_number }}
+                {{ form.phone_number.errors }}
             </div>
             <div class="form-group">
                 {{ form.email.label_tag }} {{ form.email }}
+                {{ form.email.errors }}
             </div>
             <div class="form-group">
                 {{ form.password.label_tag }} {{ form.password }}
+                {{ form.password.errors }}
             </div>
             <div class="form-group">
                 {{ form.confirm_password.label_tag }} {{ form.confirm_password }}
+                {{ form.confirm_password.errors }}
             </div>
             <button type="submit" class="btn btn-primary">Signup</button>
         </form>
     </div>
 
     <div id="popup" class="popup">
-        <p>Signup successful!</p>
-        <button onclick="closePopup()">OK</button>
+        <p id="popup-message"></p>
+        <button id="popup-button">OK</button>
     </div>
 </body>
 </html>

@@ -71,13 +71,12 @@ def doctor_reg_view(request):
         if form.is_valid():
             # Create a new user
             user = User.objects.create_user(
-                # username=form.cleaned_data['email'],  # Using email as username
                 email=form.cleaned_data['email'],
                 # Accessing email from cleaned_data
                 password=form.cleaned_data['password'],
             )
             # Create a new doctor profile
-            doctor = Doctor.objects.create(
+            Doctor.objects.create(
                 user=user,
                 title=form.cleaned_data['title'],
                 firstname=form.cleaned_data['firstname'],
@@ -86,10 +85,14 @@ def doctor_reg_view(request):
                 specialty=form.cleaned_data['specialty'],
                 phone_number=form.cleaned_data['phone_number']
             )
-            # Redirect after successful signup
-            return redirect('homepage')  # or another URL
+            return render(request, 'doctor_reg.html',
+                          {'form': form, 'success': True})
+        else:
+            return render(request, 'doctor_reg.html',
+                          {'form': form, 'success': False})
     else:
         form = DoctorRegistrationForm()
+
     return render(request, 'doctor_reg.html', {'form': form})
 
 
@@ -154,19 +157,22 @@ def patient_welcome_view(request):
 
 
 def doctor_dashboard(request):
+    user = request.user
+    doctor = get_object_or_404(Doctor,
+                                user=user)
     # Get the logged-in doctor's instance
     today = datetime.date.today()
 
     # Calculate total patients who have appointments from today onward
     total_patients = Appointment.objects.filter(
-        doctor=request.user.doctor,
+        doctor=doctor,
         date__gte=today
     ).values('patient').distinct().count()
 
     # Pending patients are those with a pending appointment status
     pending_patients = Appointment.objects.filter(
         status='pending',
-        doctor=request.user.doctor,
+        doctor=doctor,
         date__gte=today
         # To ensure only upcoming pending appointments are shown
     )
@@ -174,7 +180,7 @@ def doctor_dashboard(request):
     # Today's appointments
     todays_appointments = Appointment.objects.filter(
         date=today,
-        doctor=request.user.doctor
+        doctor=doctor
     )
 
     context = {

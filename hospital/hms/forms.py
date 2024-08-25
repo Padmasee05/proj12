@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, RegexValidator
 import re
 from .models import User, Patient, Doctor, Appointment
+from django.utils import timezone
 
 
 class PatientRegistrationForm(forms.ModelForm):
@@ -124,19 +125,71 @@ class DoctorRegistrationForm(forms.ModelForm):
     email = forms.EmailField(required=True)  # Ensure email is included
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
+    title = forms.ChoiceField(choices=Doctor.TITLE_CHOICES, required=True)
+    specialty = forms.ChoiceField(choices=Doctor.speciality_choice,
+                                  required=True)
+    dob = forms.DateField(widget=forms.TextInput(attrs={'id': 'id_dob'}))
+    phone_number = forms.CharField(required=True)
 
     class Meta:
         model = Doctor
         fields = ['title', 'firstname', 'lastname', 'dob', 'specialty',
                   'phone_number', 'email', 'password']  # Include 'email'
 
-    title = forms.ChoiceField(choices=Doctor.TITLE_CHOICES, required=True)
-    specialty = forms.ChoiceField(choices=Doctor.speciality_choice,
-                                  required=True)
-    dob = forms.DateField(widget=forms.TextInput(attrs={'id': 'id_dob'}))
+    def clean_firstname(self):
+        firstname = self.cleaned_data.get('firstname')
+        if not firstname.isalpha():
+            raise forms.ValidationError(
+                "First name should contain only letters.")
+        return firstname
+
+    def clean_lastname(self):
+        lastname = self.cleaned_data.get('lastname')
+        if not lastname.isalpha():
+            raise forms.ValidationError(
+                "Last name should contain only letters.")
+        return lastname
+
+    def clean_dob(self):
+        dob = self.cleaned_data.get('dob')
+        today = timezone.now().date()
+        age = (today.year - dob.year) - int(
+            (today.month, today.day) < (dob.month, dob.day))
+
+        if age < 18:
+            raise forms.ValidationError("You must be at least 18 years old.")
+        if dob >= today:
+            raise forms.ValidationError(
+                "Date of birth must be a valid date in the past.")
+
+        return dob
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get('phone_number')
+        if not re.match(r'^\d{10}$', phone_number):
+            raise forms.ValidationError(
+                "Phone number must be a valid 10-digit number.")
+        return phone_number
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
+        if len(password) < 8:
+            raise forms.ValidationError(
+                "Password should be at least 8 characters long.")
+        if not re.search(r'[A-Z]', password):
+            raise forms.ValidationError(
+                "Password should contain at least one uppercase letter.")
+        if not re.search(r'[a-z]', password):
+            raise forms.ValidationError(
+                "Password should contain at least one lowercase letter.")
+        if not re.search(r'[0-9]', password):
+            raise forms.ValidationError(
+                "Password should contain at least one digit.")
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            raise forms.ValidationError(
+                "Password should contain at least one special character.")
+
+        # Validate the password using Django's built-in validators
         try:
             validate_password(password)
         except ValidationError as e:
